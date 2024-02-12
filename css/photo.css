@@ -1,0 +1,11 @@
+.image-container {
+    padding: 2% 20%; /* 在左右各自留出 10% 的空白 */
+    box-sizing: border-box; /* 使得 padding 不会增加元素的宽度 */
+    overflow: hidden; /* 隐藏超出容器的部分 */
+}
+.image-container img {
+    max-width: 100%; /* 图片宽度最大不超过容器宽度 */
+    height: auto; /* 保持图片高度自适应 */
+    display: block; /* 让图片作为块级元素，从而使 margin 居中生效 */
+    margin: 0 auto; /* 水平居中图片 */
+}

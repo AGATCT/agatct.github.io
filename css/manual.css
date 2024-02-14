@@ -74,3 +74,33 @@ input:checked + .banner-nav-a {
 #banner-control-3:checked ~ .banner-img-container{
 	transform: translateX(-20%);
 }
+
+/* 左右翻页 */
+.prev-btn, .next-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #fff;
+}
+
+.prev-btn {
+  left: 10px;
+}
+
+.next-btn {
+  right: 10px;
+}
+
+/* 当 radio input 被选中时，显示对应的轮播图 */
+#prev-slide:checked ~ .slider {
+  transform: translateX(0); /* 显示前一页 */
+}
+
+#next-slide:checked ~ .slider {
+  transform: translateX(-100%); /* 显示下一页 */
+}

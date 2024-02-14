@@ -1,5 +1,5 @@
 .image-container {
-    padding: 2% 20%; /* 在左右各自留出 10% 的空白 */
+    padding: 2% 15%; /* 在左右各自留出 10% 的空白 */
     box-sizing: border-box; /* 使得 padding 不会增加元素的宽度 */
     overflow: hidden; /* 隐藏超出容器的部分 */
 }

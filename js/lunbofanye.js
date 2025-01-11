@@ -1,41 +1,56 @@
+document.addEventListener('DOMContentLoaded', function () {
+    // 获取所有的 radio 按钮
+    let radios = document.querySelectorAll('input[name="radio-set"]');
 
-// 获取图片元素和圆点元素
-const slides = document.querySelectorAll('.banner-img-container img');
-const dots = document.querySelectorAll('input[name="radio-set"]');
+    // 获取当前选中的 radio 的索引
+    function getCurrentIndex() {
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                return i;
+            }
+        }
+        return 0; // 默认返回第一个
+    }
 
-// 获取左右切换按钮元素
-const prevBtn = document.querySelector('.prev-btn');
-const nextBtn = document.querySelector('.next-btn');
+    // 显示上一张
+    function prevSlide() {
+        let currentIndex = getCurrentIndex();
+        // 如果当前是第一个，跳转到最后一个
+        if (currentIndex === 0) {
+            radios[radios.length - 1].checked = true;
+        } else {
+            radios[currentIndex - 1].checked = true;
+        }
+    }
 
-// 当前显示图片的索引
-let currentIndex = 0;
+    // 显示下一张
+    function nextSlide() {
+        let currentIndex = getCurrentIndex();
+        // 如果当前是最后一张，跳转到第一个
+        if (currentIndex === radios.length - 1) {
+            radios[0].checked = true;
+        } else {
+            radios[currentIndex + 1].checked = true;
+        }
+    }
 
-// 向前翻页函数
-function prevSlide() {
-    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-    updateSlide();
-}
+    // 绑定事件：点击左按钮
+    const prevBtn = document.querySelector('.prev-btn');
+    if (prevBtn) {
+        prevBtn.addEventListener('click', prevSlide);
+    }
 
-// 向后翻页函数
-function nextSlide() {
-    currentIndex = (currentIndex + 1) % slides.length;
-    updateSlide();
-}
+    // 绑定事件：点击右按钮
+    const nextBtn = document.querySelector('.next-btn');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', nextSlide);
+    }
 
-// 更新轮播图显示状态
-function updateSlide() {
-    // 隐藏所有图片和圆点
-    slides.forEach(slide => slide.style.display = 'none');
-    dots.forEach(dot => dot.checked = false);
-
-    // 显示当前索引的图片和圆点
-    slides[currentIndex].style.display = 'block';
-    dots[currentIndex].checked = true;
-}
-
-// 添加左右切换按钮点击事件监听
-prevBtn.addEventListener('click', prevSlide);
-nextBtn.addEventListener('click', nextSlide);
-
-// 初始化轮播图状态
-updateSlide();
+    // 绑定事件：点击圆点切换
+    radios.forEach((radio, index) => {
+        radio.addEventListener('click', function () {
+            // 点击圆点时，设置对应的 radio 按钮为选中状态
+            radios[index].checked = true;
+        });
+    });
+});

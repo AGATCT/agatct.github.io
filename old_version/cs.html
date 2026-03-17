@@ -14,6 +14,104 @@
     p {
         text-indent: 2em;
     }
+
+    .project-list {
+      margin-top: 30px;
+    }
+
+    .project-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .project-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .project-image {
+      flex: 0 0 300px;
+      margin-right: 30px;
+    }
+
+    .project-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      object-fit: cover;
+      max-height: 200px;
+    }
+
+    .project-content {
+      flex: 1;
+    }
+
+    .project-content h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #2C3E50;
+      text-transform: none;
+    }
+
+    .project-content p {
+      margin-bottom: 0;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 767px) {
+      .project-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .project-image {
+        flex: 0 0 auto;
+        margin-right: 0;
+        margin-bottom: 25px;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .project-image img {
+        max-height: 250px;
+      }
+    }
+
+    /* Platform links styling */
+    .platform-links {
+      margin-top: 60px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .platform-links .portfolio-item {
+      display: inline-block;
+      float: none;
+      vertical-align: middle;
+    }
+
+    /* Heading styles for portfolio section */
+    #portfolio h1 {
+      font-size: 2.8em;
+      text-transform: none;
+      margin: 50px 0 30px 0;
+      text-align: center;
+    }
+
+    #portfolio h2 {
+      font-size: 2.2em;
+      text-transform: none;
+      margin: 60px 0 30px 0;
+      text-align: center;
+    }
   </style>
 
   <!-- Bootstrap Core CSS -->
@@ -101,38 +199,75 @@
 <!-- Portfolio Grid Section -->
 <section id="portfolio">
   <div class="container">
-    <div class="row">
-      <h1 style="text-align: center; margin: 50px">项目基本陈列</h1>
-      <div class="col-sm-6" style="margin-bottom: 40px">
-        <h3>ENC by Byte</h3>
-        <p>Encryption and decryption by byte</p>
-      </div>
-      <div class="col-sm-6" style="margin-bottom: 40px">
-        <h3>Molecular Descriptor based on GCN-CNN Contrastive Learning</h3>
-        <p>The SMILES Graph-Image Contrastive Learning model, SGICLR is built based on GCN and CNN. After fine-tuning, SGICLR achieves competent performance in predicting the properties of drug molecules.</p>
-      </div>
-      <div class="col-sm-6" style="margin-bottom: 40px">
-        <h3>agatct.github.io</h3>
-        <p>Personal homepage.</p>
-      </div>
-      <div class="col-sm-6" style="margin-bottom: 40px">
-        <h3>Border-Watermark</h3>
-        <p>Watermark for photos, with pattern inspired by XIAOMI-LEICA Watermark</p>
-        <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
-          <img src="img/cloud.jpg" class="img-responsive" alt="">
-        </a>
+    <h1>项目基本陈列</h1>
+    <h2>深度学习</h2>
+    <div class="project-list">
+      
+
+      <!-- Project 2: Molecular Descriptor based on GCN-CNN Contrastive Learning -->
+      <div class="project-item">
+        <div class="project-image">
+          <img src="img/cstlogo.png" class="img-responsive" alt="Molecular Descriptor">
+        </div>
+        <div class="project-content">
+          <h3>Molecular Descriptor based on GCN-CNN Contrastive Learning</h3>
+          <p>The SMILES Graph-Image Contrastive Learning model, SGICLR is built based on GCN and CNN. After fine-tuning, SGICLR achieves competent performance in predicting the properties of drug molecules.</p>
+        </div>
       </div>
 
-      <div class="col-sm-6" style="margin-bottom: 40px">
-        <h3>Building Segmentation from Remote Sensing Imagery：CBAM-UNet</h3>
-        <p>A new kind of U-Net combined with CBAM attention mechanism, showing better performance in the building segmentation task from remote sensing imagery.</p>
-        <a href="#portfolioModal2" class="portfolio-link" data-toggle="modal">
-          <img src="img/CBAM.png" class="img-responsive" alt="">
-        </a>
+      <!-- Project: Building Segmentation from Remote Sensing Imagery：CBAM-UNet -->
+      <div class="project-item">
+        <div class="project-image">
+          <a href="#portfolioModal2" class="portfolio-link" data-toggle="modal">
+            <img src="img/CBAM.png" class="img-responsive" alt="CBAM-UNet">
+          </a>
+        </div>
+        <div class="project-content">
+          <h3>Building Segmentation from Remote Sensing Imagery：CBAM-UNet</h3>
+          <p>A new kind of U-Net combined with CBAM attention mechanism, showing better performance in the building segmentation task from remote sensing imagery.</p>
+        </div>
       </div>
+
+      <!-- Project 3: agatct.github.io -->
+      <div class="project-item">
+        <div class="project-image">
+          <img src="img/cstlogo.png" class="img-responsive" alt="Personal Homepage">
+        </div>
+        <div class="project-content">
+          <h3>agatct.github.io</h3>
+          <p>Personal homepage.</p>
+        </div>
+      </div>
+      <h2>创意</h2>
+      <!-- Project: ENC by Byte -->
+      <div class="project-item">
+        <div class="project-image">
+          <img src="img/cstlogo.png" class="img-responsive" alt="ENC by Byte">
+        </div>
+        <div class="project-content">
+          <h3>ENC by Byte</h3>
+          <p>Encryption and decryption by byte</p>
+        </div>
+      </div>
+
+      <!-- Project: Border-Watermark -->
+      <div class="project-item">
+        <div class="project-image">
+          <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
+            <img src="img/cloud.jpg" class="img-responsive" alt="Border-Watermark">
+          </a>
+        </div>
+        <div class="project-content">
+          <h3>Border-Watermark</h3>
+          <p>Watermark for photos, with pattern inspired by XIAOMI-LEICA Watermark</p>
+        </div>
+      </div>
+
+      
     </div>
 
-    <div class="row">
+    <!-- Platform Links -->
+    <div class="row platform-links">
       <div class="col-sm-3 portfolio-item" style="height: 150px;">
         <a href="https://github.com/AGATCT" class="portfolio-link" data-toggle="modal">
           <img src="img/moreplatform/github-logo.png" class="img-responsive" alt="" style="align-items: center; max-width: 200px;">
@@ -145,6 +280,7 @@
       </div>
     </div>
 
+    <!-- Long Image -->
     <div class="image-containerlong">
       <img src="img/jinjialing.jpg">
     </div>
@@ -192,66 +328,13 @@
 <!-- Contact Section -->
 
 <!-- Footer -->
-<footer class="text-center">
-  <div class="footer-above">
-    <div class="container">
-      <div class="row">
-        <div class="footer-col col-md-4">
-          <h3>Location</h3>
-          <p><a href="https://space.bilibili.com/356534833">Bilibili: AGATCT</a>.</p>
-          <p><a href="https://500px.com.cn/community/user-details/e58b791db4f2ba908ab99f2c553c29553">视觉中国500px: AGATCT</a>.</p>
-        </div>
-        <div class="footer-col col-md-4">
-          <h3>AGATCT</h3>
-          <!-- <p><a href="http://startbootstrap.com">AGATCT</a>.</p> -->
-          <!-- <pstyle="text-align:center;">
-              <img class="img-responsive" src="img/zheng.png" alt="" width="200px">
-          </p> -->
-          <p align="center">
-            <a href="http://www.sdlyyz.net/">
-              <img class="img-responsive" src="img/lyyz3.png" alt="" width="240px">
-            </a>
-          </p>
-          <p align="center">
-            <a href="http://cst.qdu.edu.cn/">
-              <img class="img-responsive" src="img/cstlogo.png" alt="" width="260px">
-            </a>
-          </p>
-
-        </div>
-        <div class="footer-col col-md-4">
-          <h3>Around the Web</h3>
-          <ul class="list-inline">
-            <li>
-              <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
-            </li>
-            <li>
-              <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
-            </li>
-            <li>
-              <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
-            </li>
-            <li>
-              <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
-            </li>
-            <li>
-              <a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="footer-below">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          Copyright &copy; AGATCT 2024
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
+<div id="footer-container"></div>
+<script>
+fetch('footer.html')
+  .then(r => r.text())
+  .then(html => document.getElementById('footer-container').innerHTML = html)
+  .catch(err => console.warn('页脚加载失败:', err));
+</script>
 
 <!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
 <div class="scroll-top page-scroll hidden-sm hidden-xs hidden-lg hidden-md">

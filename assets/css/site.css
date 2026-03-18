@@ -10,7 +10,7 @@
     --shadow: rgba(87, 104, 130, 0.12);
     --sidebar-bg: rgba(250, 252, 254, 0.32);
     --theme-button-bg: rgba(250, 252, 254, 0.7);
-    --sidebar-width: 220px;
+    --sidebar-width: 240px;
 }
 
 [data-theme="dark"] {
@@ -44,7 +44,8 @@ html {
 
 #top,
 #home,
-#creative-home {
+#creative-home,
+#cyber-home {
     scroll-margin-top: 0;
 }
 
@@ -213,6 +214,10 @@ body::before {
     padding: 0.75rem 1rem;
     border-radius: 10px;
     transition: all 0.2s ease;
+}
+
+.nav-links a span {
+    white-space: nowrap;
 }
 
 .nav-links a:hover {
@@ -511,7 +516,7 @@ p {
 }
 
 html:not([data-theme="dark"]) #links .contact-link {
-    background: rgba(16, 64, 128, 0.3);
+    background: rgba(16, 64, 128, 0.36);
 }
 
 .contact-link svg {
@@ -538,6 +543,72 @@ html:not([data-theme="dark"]) #links .contact-link {
     margin-top: 0.4rem;
     color: var(--accent);
     font-size: 0.82rem;
+}
+
+.museum-stack {
+    display: grid;
+    gap: 1rem;
+}
+
+.museum-exhibit {
+    display: grid;
+    gap: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme="dark"] .museum-exhibit {
+    background: rgba(17, 28, 42, 0.38);
+}
+
+.museum-frame {
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(229, 238, 248, 0.42);
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+[data-theme="dark"] .museum-frame {
+    background: rgba(10, 18, 29, 0.6);
+}
+
+.museum-frame img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+}
+
+.museum-copy {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.museum-copy h3 {
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.museum-datetime {
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+}
+
+.museum-copy p {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 42rem;
+}
+
+.museum-note {
+    border-left: 3px solid var(--accent);
+    padding-left: 0.9rem;
 }
 
 footer {
@@ -690,6 +761,7 @@ footer p {
     #contact .contact-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #links .contact-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .works-grid { grid-template-columns: 1fr; }
+    .museum-exhibit { padding: 0.85rem; }
 }
 
 

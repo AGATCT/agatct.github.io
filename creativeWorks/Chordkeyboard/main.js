@@ -73,6 +73,13 @@
     const octaveOutputEl = document.getElementById('octave-output');
     const octaveRangeEl = document.getElementById('octave-range');
     const octaveScaleEl = document.getElementById('octave-scale');
+    const inversionSelect = document.getElementById('inversion');
+    const inversionToggleEl = document.getElementById('inversion-toggle');
+    const inversionCurrentEl = document.getElementById('inversion-current');
+    const inversionEditorEl = document.getElementById('inversion-editor');
+    const inversionOutputEl = document.getElementById('inversion-output');
+    const inversionRangeEl = document.getElementById('inversion-range');
+    const inversionScaleEl = document.getElementById('inversion-scale');
     const voiceToggleEl = document.getElementById('voice-toggle');
     const voiceCurrentEl = document.getElementById('voice-current');
     const voiceEditorEl = document.getElementById('voice-editor');
@@ -82,6 +89,7 @@
     const keyboardEl = document.getElementById('keyboard-visualization');
     const pianoEl = document.getElementById('piano-visualization');
     const octaveValues = [-24, -12, 0, 12];
+    const inversionValues = [0, 1, 2];
     const voiceChoiceMeta = {
         grand_piano: {
             short: '大钢琴',
@@ -193,15 +201,35 @@
             attack: 0.26,
             release: 2
         },
-        voice_oohs: {
-            short: 'Oohs',
-            long: 'Voice Oohs',
-            hint: '更圆更暗',
-            instrument: 'voice_oohs',
+        cello: {
+            short: 'Cello',
+            long: 'Cello',
+            hint: '温暖厚实',
+            instrument: 'cello',
             sustained: true,
             fallbackType: 'triangle',
-            attack: 0.24,
-            release: 1.9
+            attack: 0.12,
+            release: 1.7
+        },
+        french_horn: {
+            short: 'Horn',
+            long: 'French Horn',
+            hint: '庄重宽广',
+            instrument: 'french_horn',
+            sustained: true,
+            fallbackType: 'sawtooth',
+            attack: 0.1,
+            release: 1.5
+        },
+        clarinet: {
+            short: 'Clarinet',
+            long: 'Clarinet',
+            hint: '木管质感',
+            instrument: 'clarinet',
+            sustained: true,
+            fallbackType: 'square',
+            attack: 0.06,
+            release: 1.25
         }
     };
     const octaveChoiceMeta = {
@@ -209,6 +237,11 @@
         '-12': { short: '低一组', long: '低一个八度', mark: '低一' },
         '0': { short: '原始', long: '原始音域', mark: '原始' },
         '12': { short: '高一组', long: '高一个八度', mark: '高一' }
+    };
+    const inversionChoiceMeta = {
+        '0': { short: '原位', long: '原位', mark: '原位' },
+        '1': { short: '一转', long: '第一转位', mark: '一转' },
+        '2': { short: '二转', long: '第二转位', mark: '二转' }
     };
 
     // 初始化选项
@@ -290,6 +323,17 @@
         updateSliderScale(octaveScaleEl, rangeIndex);
     }
 
+    function updateInversionUI() {
+        const value = String(inversionSelect.value);
+        const meta = inversionChoiceMeta[value];
+        const rangeIndex = inversionValues.indexOf(Number(value));
+
+        inversionCurrentEl.textContent = meta.short;
+        inversionOutputEl.textContent = meta.long;
+        inversionRangeEl.value = String(rangeIndex);
+        updateSliderScale(inversionScaleEl, rangeIndex);
+    }
+
     function buildVoiceOptions() {
         if (!voiceOptionsEl) return;
 
@@ -341,6 +385,7 @@
         const controls = {
             tonic: { toggle: tonicToggleEl, editor: tonicEditorEl, focusTarget: tonicRangeEl },
             octave: { toggle: octaveToggleEl, editor: octaveEditorEl, focusTarget: octaveRangeEl },
+            inversion: { toggle: inversionToggleEl, editor: inversionEditorEl, focusTarget: inversionRangeEl },
             voice: {
                 toggle: voiceToggleEl,
                 editor: voiceEditorEl,
@@ -379,6 +424,91 @@
         return offset;
     }
 
+    function normalizeChordVoicing(midis) {
+        return [...midis].sort((a, b) => a - b);
+    }
+
+    function getPitchClass(midi) {
+        return ((midi % 12) + 12) % 12;
+    }
+
+    function findHighestIndexByPitchClass(midis, pitchClass) {
+        for (let i = midis.length - 1; i >= 0; i -= 1) {
+            if (getPitchClass(midis[i]) === pitchClass) return i;
+        }
+        return -1;
+    }
+
+    function getTemporaryInversionDirection() {
+        if (modifierKeys.arrowLeft === modifierKeys.arrowRight) return 0;
+        return modifierKeys.arrowRight ? 1 : -1;
+    }
+
+    function moveLowestNoteToTop(midis, fifthPitchClass = null, seventhPitchClass = null) {
+        if (midis.length < 2) return normalizeChordVoicing(midis);
+
+        const nextMidis = normalizeChordVoicing(midis);
+        const movingIndexes = [0];
+
+        if (
+            seventhPitchClass !== null &&
+            fifthPitchClass !== null &&
+            getPitchClass(nextMidis[0]) === fifthPitchClass
+        ) {
+            const seventhIndex = findHighestIndexByPitchClass(nextMidis, seventhPitchClass);
+            if (seventhIndex > 0) {
+                movingIndexes.push(seventhIndex);
+            }
+        }
+
+        return normalizeChordVoicing(nextMidis.map((midi, index) => (
+            movingIndexes.includes(index) ? midi + 12 : midi
+        )));
+    }
+
+    function moveHighestNoteToBottom(midis, info, fifthPitchClass = null, seventhPitchClass = null) {
+        if (midis.length < 2) return normalizeChordVoicing(midis);
+
+        const nextMidis = normalizeChordVoicing(midis);
+        let movableTopIndex = nextMidis.length - 1;
+
+        if (
+            info.offs.length >= 4 &&
+            seventhPitchClass !== null &&
+            getPitchClass(nextMidis[movableTopIndex]) === seventhPitchClass &&
+            movableTopIndex > 0
+        ) {
+            movableTopIndex -= 1;
+        }
+
+        const movingIndexes = [movableTopIndex];
+
+        if (
+            seventhPitchClass !== null &&
+            fifthPitchClass !== null &&
+            getPitchClass(nextMidis[movableTopIndex]) === fifthPitchClass
+        ) {
+            const seventhIndex = findHighestIndexByPitchClass(nextMidis, seventhPitchClass);
+            if (seventhIndex > movableTopIndex) {
+                movingIndexes.push(seventhIndex);
+            }
+        }
+
+        return normalizeChordVoicing(nextMidis.map((midi, index) => (
+            movingIndexes.includes(index) ? midi - 12 : midi
+        )));
+    }
+
+    function applyConfiguredInversion(midis, info, inversionMode, fifthPitchClass, seventhPitchClass) {
+        if (inversionMode === 1) {
+            return moveLowestNoteToTop(midis, fifthPitchClass, seventhPitchClass);
+        }
+        if (inversionMode === 2) {
+            return moveHighestNoteToBottom(midis, info, fifthPitchClass, seventhPitchClass);
+        }
+        return normalizeChordVoicing(midis);
+    }
+
     function getChordPlaybackState(key) {
         const info = chordMap[key];
         if (!info) return null;
@@ -387,9 +517,41 @@
         const octave = +octaveSelect.value;
         const voice = voiceSelect.value;
         const tempOctaveOffset = getModifierOctaveOffset();
-        const midis = info.offs.map(offset => baseMidiC4 + offset + tonic + octave + tempOctaveOffset);
+        const configuredInversionMode = Number(inversionSelect.value);
+        const temporaryInversionDirection = getTemporaryInversionDirection();
+        const baseMidis = normalizeChordVoicing(
+            info.offs.map(offset => baseMidiC4 + offset + tonic + octave + tempOctaveOffset)
+        );
+        const fifthPitchClass = info.offs.length >= 3
+            ? getPitchClass(baseMidis[2])
+            : null;
+        const seventhPitchClass = info.offs.length >= 4
+            ? getPitchClass(baseMidis[3])
+            : null;
+        let midis = applyConfiguredInversion(
+            baseMidis,
+            info,
+            configuredInversionMode,
+            fifthPitchClass,
+            seventhPitchClass
+        );
 
-        return { info, tonic, octave, voice, tempOctaveOffset, midis };
+        if (temporaryInversionDirection > 0) {
+            midis = moveLowestNoteToTop(midis, fifthPitchClass, seventhPitchClass);
+        } else if (temporaryInversionDirection < 0) {
+            midis = moveHighestNoteToBottom(midis, info, fifthPitchClass, seventhPitchClass);
+        }
+
+        return {
+            info,
+            tonic,
+            octave,
+            voice,
+            tempOctaveOffset,
+            configuredInversionMode,
+            temporaryInversionDirection,
+            midis
+        };
     }
 
     function toVisiblePianoMidis(midis) {
@@ -521,7 +683,7 @@
         const playbackState = getChordPlaybackState(key);
         if (!playbackState) return;
 
-        const { info, voice, midis } = playbackState;
+        const { info, voice, configuredInversionMode, temporaryInversionDirection, midis } = playbackState;
         const voicePreset = getVoicePreset(voice);
         
         // 如果是弦乐音色，先停止之前播放的音符
@@ -535,6 +697,10 @@
         let statusText = `播放：${info.name}（键 ${key.toUpperCase()}）`;
         if (modifierKeys.arrowUp) statusText += ' ↑+1八度';
         if (modifierKeys.arrowDown) statusText += ' ↓-1八度';
+        statusText += ` ${inversionChoiceMeta[String(configuredInversionMode)].long}`;
+        if (temporaryInversionDirection !== 0) {
+            statusText += temporaryInversionDirection > 0 ? ' →临时上转位' : ' ←临时下转位';
+        }
         statusEl.textContent = statusText;
         
         // 确保音频已初始化
@@ -635,11 +801,35 @@
         ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\''],
         ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/']
     ];
+    const modifierKeyMeta = [
+        { key: 'ArrowUp', symbol: '↑', label: '升八度', row: 'top' },
+        { key: 'ArrowLeft', symbol: '←', label: '下转位', row: 'bottom' },
+        { key: 'ArrowDown', symbol: '↓', label: '降八度', row: 'bottom' },
+        { key: 'ArrowRight', symbol: '→', label: '上转位', row: 'bottom' }
+    ];
+
+    function createKeyboardModifierKey({ key, symbol, label }) {
+        const keyEl = document.createElement('div');
+        keyEl.className = 'keyboard-key mapped keyboard-key-modifier';
+        keyEl.id = 'key-' + key;
+        keyEl.innerHTML = `
+            <span class="key-label">${symbol}</span>
+            <span class="chord-label modifier-label">${label}</span>
+        `;
+        bindVirtualKeyPointerHandlers(keyEl, key, 'modifier');
+        return keyEl;
+    }
 
     // 创建可视化键盘
     function createKeyboardVisualization() {
+        keyboardEl.innerHTML = '';
+
         const keyboardContainer = document.createElement('div');
         keyboardContainer.className = 'keyboard-container';
+        const keyboardLayoutEl = document.createElement('div');
+        keyboardLayoutEl.className = 'keyboard-layout';
+        const keyboardMainEl = document.createElement('div');
+        keyboardMainEl.className = 'keyboard-main';
         
         keyboardLayout.forEach((row, rowIndex) => {
             const rowEl = document.createElement('div');
@@ -667,13 +857,36 @@
                     keyEl.classList.add('mapped');
                     const chordName = chordMap[key.toLowerCase()].name;
                     keyEl.innerHTML += `<span class="chord-label">${chordName}</span>`;
+                    bindVirtualKeyPointerHandlers(keyEl, key.toLowerCase(), 'chord');
                 }
                 
                 rowEl.appendChild(keyEl);
             });
             
-            keyboardContainer.appendChild(rowEl);
+            keyboardMainEl.appendChild(rowEl);
         });
+
+        const modifierPadEl = document.createElement('div');
+        modifierPadEl.className = 'keyboard-modifier-pad';
+        const modifierTopRowEl = document.createElement('div');
+        modifierTopRowEl.className = 'keyboard-modifier-row keyboard-modifier-row-top';
+        const modifierBottomRowEl = document.createElement('div');
+        modifierBottomRowEl.className = 'keyboard-modifier-row keyboard-modifier-row-bottom';
+
+        modifierKeyMeta.forEach(meta => {
+            const keyEl = createKeyboardModifierKey(meta);
+            if (meta.row === 'top') {
+                modifierTopRowEl.appendChild(keyEl);
+            } else {
+                modifierBottomRowEl.appendChild(keyEl);
+            }
+        });
+
+        modifierPadEl.appendChild(modifierTopRowEl);
+        modifierPadEl.appendChild(modifierBottomRowEl);
+        keyboardLayoutEl.appendChild(keyboardMainEl);
+        keyboardLayoutEl.appendChild(modifierPadEl);
+        keyboardContainer.appendChild(keyboardLayoutEl);
         
         keyboardEl.appendChild(keyboardContainer);
     }
@@ -772,6 +985,19 @@
     }
 
     const activeSet = new Set();
+    const activeChordSources = new Map();
+    const modifierInputSources = {
+        ArrowUp: new Set(),
+        ArrowDown: new Set(),
+        ArrowLeft: new Set(),
+        ArrowRight: new Set()
+    };
+    const modifierKeyMap = {
+        ArrowUp: 'arrowUp',
+        ArrowDown: 'arrowDown',
+        ArrowLeft: 'arrowLeft',
+        ArrowRight: 'arrowRight'
+    };
     
     // 存储正在播放的音符（仅用于弦乐音色，以便在释放键时停止）
     const activePlayingNotes = new Map(); // key -> Array of audio nodes/notes
@@ -785,8 +1011,105 @@
     // 修饰键状态追踪
     const modifierKeys = {
         arrowUp: false,
-        arrowDown: false
+        arrowDown: false,
+        arrowLeft: false,
+        arrowRight: false
     };
+
+    function getInputSourceSet(sourceMap, key) {
+        if (!sourceMap.has(key)) {
+            sourceMap.set(key, new Set());
+        }
+        return sourceMap.get(key);
+    }
+
+    async function pressChordInput(key, source) {
+        if (!chordMap[key]) return;
+
+        const sources = getInputSourceSet(activeChordSources, key);
+        if (sources.has(source)) return;
+
+        const wasActive = sources.size > 0;
+        sources.add(source);
+        if (wasActive) return;
+
+        activeSet.add(key);
+        setComputerKeyPressed(key, true);
+        await playChord(key);
+    }
+
+    function releaseChordInput(key, source) {
+        const sources = activeChordSources.get(key);
+        if (!sources || !sources.has(source)) return;
+
+        sources.delete(source);
+        if (sources.size > 0) return;
+
+        activeChordSources.delete(key);
+        releaseChord(key);
+    }
+
+    async function pressModifierInput(key, source) {
+        const sources = modifierInputSources[key];
+        const modifierKey = modifierKeyMap[key];
+        if (!sources || !modifierKey || sources.has(source)) return;
+
+        const wasActive = sources.size > 0;
+        sources.add(source);
+        if (wasActive) return;
+
+        modifierKeys[modifierKey] = true;
+        setComputerKeyPressed(key, true);
+        await replayActiveChords();
+    }
+
+    async function releaseModifierInput(key, source) {
+        const sources = modifierInputSources[key];
+        const modifierKey = modifierKeyMap[key];
+        if (!sources || !modifierKey || !sources.has(source)) return;
+
+        sources.delete(source);
+        if (sources.size > 0) return;
+
+        modifierKeys[modifierKey] = false;
+        setComputerKeyPressed(key, false);
+        await replayActiveChords();
+    }
+
+    function bindVirtualKeyPointerHandlers(keyEl, inputKey, inputType) {
+        if (!keyEl) return;
+
+        const releaseFromPointer = async ev => {
+            const source = `pointer:${ev.pointerId}`;
+            if (inputType === 'modifier') {
+                await releaseModifierInput(inputKey, source);
+            } else {
+                releaseChordInput(inputKey, source);
+            }
+
+            if (keyEl.hasPointerCapture?.(ev.pointerId)) {
+                keyEl.releasePointerCapture(ev.pointerId);
+            }
+        };
+
+        keyEl.addEventListener('pointerdown', async ev => {
+            if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+
+            ev.preventDefault();
+            keyEl.setPointerCapture?.(ev.pointerId);
+            const source = `pointer:${ev.pointerId}`;
+
+            if (inputType === 'modifier') {
+                await pressModifierInput(inputKey, source);
+            } else {
+                await pressChordInput(inputKey, source);
+            }
+        });
+
+        keyEl.addEventListener('pointerup', releaseFromPointer);
+        keyEl.addEventListener('pointercancel', releaseFromPointer);
+        keyEl.addEventListener('lostpointercapture', releaseFromPointer);
+    }
 
     function releaseChord(key) {
         activeSet.delete(key);
@@ -796,7 +1119,20 @@
     }
 
     function releaseAllActiveChords() {
+        activeChordSources.clear();
         Array.from(activeSet).forEach(releaseChord);
+    }
+
+    function resetModifierKeys() {
+        Object.values(modifierInputSources).forEach(sourceSet => sourceSet.clear());
+        modifierKeys.arrowUp = false;
+        modifierKeys.arrowDown = false;
+        modifierKeys.arrowLeft = false;
+        modifierKeys.arrowRight = false;
+        setComputerKeyPressed('ArrowUp', false);
+        setComputerKeyPressed('ArrowDown', false);
+        setComputerKeyPressed('ArrowLeft', false);
+        setComputerKeyPressed('ArrowRight', false);
     }
     
     // 重新播放所有当前按下的和弦（用于修饰键变化时）
@@ -813,20 +1149,22 @@
     window.addEventListener('keydown', async (ev) => {
         // 处理修饰键
         if (ev.key === 'ArrowUp') {
-            if (!modifierKeys.arrowUp) {
-                modifierKeys.arrowUp = true;
-                // 重新播放当前按下的和弦
-                await replayActiveChords();
-            }
+            await pressModifierInput('ArrowUp', 'keyboard');
             ev.preventDefault();
             return;
         }
         if (ev.key === 'ArrowDown') {
-            if (!modifierKeys.arrowDown) {
-                modifierKeys.arrowDown = true;
-                // 重新播放当前按下的和弦
-                await replayActiveChords();
-            }
+            await pressModifierInput('ArrowDown', 'keyboard');
+            ev.preventDefault();
+            return;
+        }
+        if (ev.key === 'ArrowLeft') {
+            await pressModifierInput('ArrowLeft', 'keyboard');
+            ev.preventDefault();
+            return;
+        }
+        if (ev.key === 'ArrowRight') {
+            await pressModifierInput('ArrowRight', 'keyboard');
             ev.preventDefault();
             return;
         }
@@ -836,35 +1174,29 @@
         const k = ev.key.toLowerCase();
         if (chordMap[k]) {
             ev.preventDefault();
-            
-            // 激活视觉反馈
-            activeSet.add(k);
-            
-            // 更新键盘可视化
-            setComputerKeyPressed(k, true);
-            
-            // 播放和弦
-            await playChord(k);
+            await pressChordInput(k, 'keyboard');
         }
     });
     
     window.addEventListener('keyup', async (ev) => {
         // 处理修饰键释放
         if (ev.key === 'ArrowUp') {
-            if (modifierKeys.arrowUp) {
-                modifierKeys.arrowUp = false;
-                // 重新播放当前按下的和弦，恢复音高
-                await replayActiveChords();
-            }
+            await releaseModifierInput('ArrowUp', 'keyboard');
             ev.preventDefault();
             return;
         }
         if (ev.key === 'ArrowDown') {
-            if (modifierKeys.arrowDown) {
-                modifierKeys.arrowDown = false;
-                // 重新播放当前按下的和弦，恢复音高
-                await replayActiveChords();
-            }
+            await releaseModifierInput('ArrowDown', 'keyboard');
+            ev.preventDefault();
+            return;
+        }
+        if (ev.key === 'ArrowLeft') {
+            await releaseModifierInput('ArrowLeft', 'keyboard');
+            ev.preventDefault();
+            return;
+        }
+        if (ev.key === 'ArrowRight') {
+            await releaseModifierInput('ArrowRight', 'keyboard');
             ev.preventDefault();
             return;
         }
@@ -873,10 +1205,13 @@
         if (!chordMap[k]) return;
 
         ev.preventDefault();
-        releaseChord(k);
+        releaseChordInput(k, 'keyboard');
     });
 
-    window.addEventListener('blur', releaseAllActiveChords);
+    window.addEventListener('blur', () => {
+        releaseAllActiveChords();
+        resetModifierKeys();
+    });
 
     tonicToggleEl.addEventListener('click', () => {
         const shouldOpen = tonicEditorEl.hidden;
@@ -886,6 +1221,11 @@
     octaveToggleEl.addEventListener('click', () => {
         const shouldOpen = octaveEditorEl.hidden;
         setSliderEditorOpen('octave', shouldOpen);
+    });
+
+    inversionToggleEl.addEventListener('click', () => {
+        const shouldOpen = inversionEditorEl.hidden;
+        setSliderEditorOpen('inversion', shouldOpen);
     });
 
     voiceToggleEl.addEventListener('click', () => {
@@ -902,6 +1242,11 @@
         setSelectValue(octaveSelect, nextValue);
     });
 
+    inversionRangeEl.addEventListener('input', () => {
+        const nextValue = inversionValues[Number(inversionRangeEl.value)];
+        setSelectValue(inversionSelect, nextValue);
+    });
+
     tonicSelect.addEventListener('change', () => {
         updateTonicUI();
     });
@@ -910,11 +1255,15 @@
         updateOctaveUI();
     });
 
+    inversionSelect.addEventListener('change', () => {
+        updateInversionUI();
+    });
+
     voiceSelect.addEventListener('change', () => {
         updateVoiceUI();
     });
 
-    [tonicSelect, octaveSelect, voiceSelect].forEach(control => {
+    [tonicSelect, octaveSelect, inversionSelect, voiceSelect].forEach(control => {
         control.addEventListener('change', async () => {
             if (activeSet.size > 0) {
                 await replayActiveChords();
@@ -934,9 +1283,15 @@
             label: octaveChoiceMeta[String(value)].mark,
             index
         })), index => setSelectValue(octaveSelect, octaveValues[index]));
+        buildSliderScale(inversionScaleEl, inversionValues.map((value, index) => ({
+            value: index,
+            label: inversionChoiceMeta[String(value)].mark,
+            index
+        })), index => setSelectValue(inversionSelect, inversionValues[index]));
         buildVoiceOptions();
         updateTonicUI();
         updateOctaveUI();
+        updateInversionUI();
         updateVoiceUI();
 
         // 创建键盘可视化

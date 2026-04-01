@@ -11,7 +11,7 @@
 <body>
     <main>
         <header class="top-bar">
-            <h1>ChordKeyboard</h1>
+            <h1>ChordKeyboard <span class="title-credit">AGATCT@Github</span></h1>
             <div class="controls">
                 <section class="control-slider control-slider-tonic" aria-label="移调设置">
                     <button type="button" id="tonic-toggle" class="control-trigger" aria-expanded="false" aria-controls="tonic-editor">
@@ -34,7 +34,7 @@
 
                 <section class="control-slider control-slider-octave" aria-label="音域设置">
                     <button type="button" id="octave-toggle" class="control-trigger" aria-expanded="false" aria-controls="octave-editor">
-                        <span class="control-trigger-label">移八度</span>
+                        <span class="control-trigger-label">音域</span>
                         <span id="octave-current" class="control-trigger-value">原始</span>
                     </button>
                     <div id="octave-editor" class="slider-editor" hidden>
@@ -52,6 +52,28 @@
                         <option value="-12">低一个八度</option>
                         <option value="0" selected>原始</option>
                         <option value="12">高一个八度</option>
+                    </select>
+                </section>
+
+                <section class="control-slider control-slider-inversion" aria-label="和弦转位设置">
+                    <button type="button" id="inversion-toggle" class="control-trigger" aria-expanded="false" aria-controls="inversion-editor">
+                        <span class="control-trigger-label">转位</span>
+                        <span id="inversion-current" class="control-trigger-value">原位</span>
+                    </button>
+                    <div id="inversion-editor" class="slider-editor" hidden>
+                        <div class="slider-editor-head">
+                            <span class="slider-editor-title">转位</span>
+                            <output id="inversion-output" class="slider-editor-value" for="inversion-range">原位</output>
+                        </div>
+                        <div class="slider-axis">
+                            <input id="inversion-range" class="linear-slider" type="range" min="0" max="2" step="1" value="0" aria-label="选择和弦转位模式">
+                            <div id="inversion-scale" class="slider-scale slider-scale-inversion"></div>
+                        </div>
+                    </div>
+                    <select id="inversion" class="visually-hidden">
+                        <option value="0" selected>原位</option>
+                        <option value="1">第一转位</option>
+                        <option value="2">第二转位</option>
                     </select>
                 </section>
 
@@ -79,7 +101,9 @@
                         <option value="warm_pad">Warm Pad</option>
                         <option value="polysynth_pad">Polysynth Pad</option>
                         <option value="choir_aahs">Choir Aahs</option>
-                        <option value="voice_oohs">Voice Oohs</option>
+                        <option value="cello">Cello</option>
+                        <option value="french_horn">French Horn</option>
+                        <option value="clarinet">Clarinet</option>
                     </select>
                 </section>
             </div>
@@ -90,10 +114,6 @@
     </main>
 
     <section id="piano-panel" aria-label="88键钢琴可视化">
-        <div class="panel-heading">
-            <h2>88键钢琴演奏可视化</h2>
-            <p>默认会铺满页面底部，只有窄屏时才需要左右滑动查看完整键盘。</p>
-        </div>
         <div id="piano-visualization"></div>
     </section>
 

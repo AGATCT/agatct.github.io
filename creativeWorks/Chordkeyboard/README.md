@@ -2,21 +2,20 @@
 
 > English version is available below.
 
-ChordKeyboard 是一个在浏览器中运行的和弦演奏工具，面向首调唱名和快速和声试奏场景。它允许你直接使用电脑键盘触发预设和弦，并在页面底部提供 88 键钢琴的演奏实时可视化。
+ChordKeyboard 是在浏览器中运行的和弦演奏工具，使用电脑键盘控制，以首调唱名法演奏对应调式的和弦。
 
-![ChordKeyboard 主界面](image/README/1775015080389.png)
+![1775030859310](image/README/1775030859310.png)
 
 ## 音域和移调
 
-页面顶部提供了两个独立的离散控制：`移调` 和 `移八度`。它们默认只显示当前状态，点击后会以悬浮面板的形式展开，不会把下方的电脑键盘区域挤到更低的位置。
+页面顶部提供了三个独立的离散控制：`移调`、`音域` 和 `转位`。
 
 - `移调` 用于改变所有和弦的主音。按钮会直接显示当前调性，例如 `C`、`F#`、`Bb`。
-- `移八度` 用于整体抬高或降低演奏音区。目前提供 4 个固定档位：`低两个八度`、`低一个八度`、`原始`、`高一个八度`。
-- 这两个控制都是离散式的：既可以直接点击刻度，也可以拖动滑块在固定档位之间切换。
-- 如果在按住和弦时调整 `移调` 或 `移八度`，当前发声会立即按新的设置重播，同时底部 88 键钢琴的按下状态也会同步刷新。
-- 除了顶部的 `移八度` 控件，还可以使用方向键进行临时音域偏移：`ArrowUp` 临时升高一个八度，`ArrowDown` 临时降低一个八度，松开后恢复到当前设置的音域。
+- `音域` 用于整体抬高或降低演奏音区。目前提供 4 个固定档位：`低两个八度`、`低一个八度`、`原始`、`高一个八度`。
+- `转位` 用于设置默认和弦排列方式，目前提供 3 个模式：`原位`、`第一转位`、`第二转位`。
+- 临时音域偏移：`ArrowUp` 临时升高一个八度，`ArrowDown` 临时降低一个八度，松开后恢复到当前设置的音域。
+- 临时和弦转位：`ArrowRight` 会基于当前转位状态再做一次上转位，把当前最低音移到最上方；`ArrowLeft` 会基于当前转位状态再做一次下转位，把当前最高的和声音移到最下方。对于七和弦，如果被转位的是五音，则七音也会跟随做同方向转位。松开后会回到当前按钮设置的转位模式。
 
-![音域和移调面板](image/README/1775015463083.png)
 
 ## 音色
 
@@ -26,13 +25,13 @@ ChordKeyboard 是一个在浏览器中运行的和弦演奏工具，面向首调
 - 弦乐类：`弦乐合奏 I`、`弦乐合奏 II`
 - 风琴类：`击杆风琴`、`教堂管风琴`
 - 合成铺底：`Warm Pad`、`Polysynth Pad`
-- 人声类：`Choir Aahs`、`Voice Oohs`
+- 人声 / 独奏类：`Choir Aahs`、`Cello`、`French Horn`、`Clarinet`
 
-实际 SoundFont 资源会在切换到对应音色时按需加载，并在内存中缓存，因此增加音色选项本身不会明显增大项目体积。
+实际 SoundFont 资源会在切换到对应音色时按需加载，并在内存中缓存。
 
 ## 键位说明
 
-页面上方会显示完整的电脑键盘映射。常用主和弦入口如下：
+页面上方计算机键盘区完整展示了作者设计的键盘和弦映射。如：
 
 - `1` -> `C`
 - `2` -> `Dm`
@@ -43,17 +42,19 @@ ChordKeyboard 是一个在浏览器中运行的和弦演奏工具，面向首调
 - `7` -> `Bdim`
 - `0` -> `Gsus4`
 
-其余小和弦、七和弦和扩展和弦请以页面上的键盘标注为准。
+其余和弦以页面上的键盘标注为准。
 
 额外控制：
 
 - `ArrowUp`：临时升高一个八度
 - `ArrowDown`：临时降低一个八度
-- 松开方向键后恢复当前设置的音域
+- `ArrowRight`：基于当前转位临时再上转一次，把当前最低音移到最上面
+- `ArrowLeft`：基于当前转位临时再下转一次，把当前最高的和声音移到最下面；七和弦中若五音被转下去，七音也会一起下行
+- 松开方向键后恢复当前设置的音域和转位
 
 ## 音源说明
 
-- 默认使用 [`soundfont-player`](https://github.com/danigb/soundfont-player)
+- 默认使用 [`soundfont-player`](https://github.com/danigb/soundfont-player): https://github.com/danigb/soundfont-player
 - SoundFont 成功加载时，会使用对应乐器采样播放
 - 如果浏览器、网络或第三方脚本加载失败，则自动回退到基于 Web Audio 的合成音色
 
@@ -61,8 +62,8 @@ ChordKeyboard 是一个在浏览器中运行的和弦演奏工具，面向首调
 
 1. 直接在浏览器中打开 [index.html](index.html)
 2. 点击页面任意位置以激活音频上下文
-3. 在顶部调整 `移调`、`移八度` 和 `音色`
-4. 按下页面标注的电脑键盘键位演奏和弦
+3. 在顶部调整 `移调`、`音域`、`转位` 和 `音色`
+4. 按下实体电脑键盘，或直接点击页面上的电脑键盘按键来演奏和弦
 
 这个项目是纯前端静态页面，不需要构建步骤，也不依赖本地服务器。
 
@@ -76,21 +77,19 @@ ChordKeyboard 是一个在浏览器中运行的和弦演奏工具，面向首调
 
 ## English Version
 
-ChordKeyboard is a browser-based chord-playing tool for movable-do practice and quick harmony sketching. It lets you trigger preset chords from your computer keyboard and provides a real-time 88-key piano visualization at the bottom of the page.
+ChordKeyboard is a browser-based chord-playing tool, controlled by computer keyboard for playing chords based on movable-do system.
 
-![ChordKeyboard main view](image/README/1775015080389.png)
+![1775030859310](image/README/1775030859310.png)
 
 ## Range And Transposition
 
-At the top of the page there are two independent discrete controls: `Transposition` and `Octave Shift`. By default they only show the current state. When clicked, they open as floating panels, so the computer-keyboard area below keeps its position.
+At the top of the page there are three independent discrete controls: `Transposition`, `Octave Shift`, and `Inversion`.
 
 - `Transposition` changes the tonic for all chords globally. The trigger button always shows the current key, such as `C`, `F#`, or `Bb`.
 - `Octave Shift` moves the entire playable register up or down. There are 4 fixed steps: `Down 2`, `Down 1`, `Original`, and `Up 1`.
-- Both controls are discrete rather than continuous: you can click the ticks directly or drag the slider between fixed positions.
-- If you adjust `Transposition` or `Octave Shift` while holding chords, the current sound is replayed immediately using the new setting, and the bottom 88-key piano visualization updates at the same time.
+- `Inversion` sets the default chord voicing, with 3 modes: `Root Position`, `First Inversion`, and `Second Inversion`.
 - In addition to the top `Octave Shift` control, you can use the keyboard for temporary register offsets: `ArrowUp` raises by one octave and `ArrowDown` lowers by one octave until the key is released.
-
-![Range and transposition panel](image/README/1775015463083.png)
+- Temporary relative inversions are also supported: `ArrowRight` applies one additional upward inversion on top of the current voicing, moving the current lowest note to the top, while `ArrowLeft` applies one additional downward inversion, moving the current highest chord tone to the bottom. In seventh chords, if the fifth is the note being inverted, the seventh follows in the same direction; otherwise a top seventh stays in place and the next-highest chord tone moves instead. Releasing the key returns to the configured inversion mode.
 
 ## Voices
 
@@ -100,9 +99,9 @@ Built-in voice options currently include:
 - Strings: `String Ensemble I`, `String Ensemble II`
 - Organ: `Drawbar Organ`, `Church Organ`
 - Pads: `Warm Pad`, `Polysynth Pad`
-- Voices: `Choir Aahs`, `Voice Oohs`
+- Voices: `Choir Aahs`, `Cello`, `French Horn`, `Clarinet`
 
-Actual SoundFont assets are loaded on demand when a voice is selected and then cached in memory, so adding more voice options does not significantly increase the project size by itself.
+Actual SoundFont assets are loaded on demand when a voice is selected and then cached in memory.
 
 ## Key Controls
 
@@ -123,7 +122,9 @@ Additional controls:
 
 - `ArrowUp`: temporary octave up
 - `ArrowDown`: temporary octave down
-- Releasing the arrow key restores the current configured range
+- `ArrowRight`: apply one additional temporary upward inversion from the current voicing, moving the current lowest note to the top
+- `ArrowLeft`: apply one additional temporary downward inversion from the current voicing; in seventh chords, if the fifth moves down, the seventh follows in the same direction
+- Releasing the arrow key restores the current configured range and inversion
 
 ## Audio Source
 
@@ -135,8 +136,8 @@ Additional controls:
 
 1. Open [index.html](index.html) directly in a browser
 2. Click anywhere on the page once to unlock the audio context
-3. Adjust `Transposition`, `Octave Shift`, and `Voice` from the top controls
-4. Press the labeled computer-keyboard keys to play chords
+3. Adjust `Transposition`, `Octave Shift`, `Inversion`, and `Voice` from the top controls
+4. Play chords by pressing the physical keyboard or clicking the on-screen computer-keyboard keys
 
 This is a static frontend project. No build step or local server is required.
 

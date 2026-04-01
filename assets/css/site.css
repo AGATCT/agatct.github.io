@@ -443,6 +443,12 @@ p {
     background: rgba(246, 246, 248, 0.68);
 }
 
+.work-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
 [data-theme="dark"] .project-item,
 [data-theme="dark"] .work-card,
 [data-theme="dark"] .contact-link {
@@ -537,6 +543,10 @@ html:not([data-theme="dark"]) #links .contact-link {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.9rem;
+}
+
+.works-grid-single {
+    grid-template-columns: 1fr;
 }
 
 .work-meta {

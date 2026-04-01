@@ -1079,11 +1079,12 @@
 
     // QWERTY 键盘布局（标准布局）
     const keyboardLayout = [
-        ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
         ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'],
         ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\''],
         ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/']
     ];
+    const keyboardRowIndentStepEm = 1.5;
     const modifierKeyMeta = [
         { key: 'ArrowUp', symbol: '↑', label: '升八度', row: 'top' },
         { key: 'ArrowLeft', symbol: '←', label: '下转位', row: 'bottom' },
@@ -1127,6 +1128,10 @@
                 rowEl.style.paddingLeft = '3em'; // Shift位置
             }
             
+            if (rowIndex > 0) {
+                rowEl.style.paddingLeft = `${rowIndex * keyboardRowIndentStepEm}em`;
+            }
+
             row.forEach(key => {
                 const keyEl = document.createElement('div');
                 keyEl.className = 'keyboard-key';
